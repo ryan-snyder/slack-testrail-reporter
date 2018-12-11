@@ -7,14 +7,23 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run tsc"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
+    "btoa": "^1.2.1",
     "chalk": "^2.4.1",
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
     "node-slack": "0.0.7"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.2",
+    "typescript": "^3.2.2"
   }
 }
