@@ -67,7 +67,7 @@ export class CypressTestRailReporter extends reporters.Spec {
 
     runner.on('end', () => {
       let messageOptions = {
-          text: ">"+reporterOptions.runName+"\\n Passed: " + passes + " Failed: " + fails,
+          text: "> *"+reporterOptions.runName+"* \n Passed: " + passes + " Failed: " + fails,
           icon_emoji: '',
       };
       if (options.reporterOptions.endIcon) {
