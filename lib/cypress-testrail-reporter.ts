@@ -66,7 +66,7 @@ export class CypressTestRailReporter extends reporters.Spec {
     });
 
     runner.on('end', () => {
-      messageOptions = {
+      let messageOptions = {
           username: reporterOptions.runName+ " Tests Completed",
           text: "Passed: " + passes + " Failed: " + failures,
       };
