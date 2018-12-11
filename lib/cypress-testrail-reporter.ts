@@ -28,6 +28,7 @@ export class CypressTestRailReporter extends reporters.Spec {
       console.log("TEST CASE RUNNER IS STARTING!!!!!!!!!!!")
       const executionDateTime = moment().format('MMM Do YYYY, HH:mm (Z)');
       const name = `${reporterOptions.runName || 'Automated test run'} - ${executionDateTime}`;
+      // get the actual cypress dashboard url
       const description = 'For the Cypress run visit https://dashboard.cypress.io/#/projects/runs';
 
       reporterOptions.createTestRun === true && this.testRail.createRun(name, description);
@@ -66,10 +67,34 @@ export class CypressTestRailReporter extends reporters.Spec {
     });
 
     runner.on('end', () => {
-      let messageOptions = {
-          text: "> *"+reporterOptions.runName+"* \n Passed: " + passes + " Failed: " + fails,
-          icon_emoji: '',
-      };
+      //Add logic to determine pass/fail
+      const status = passes/(passes+fails) >= 0.9 ? 'pass' : 'fail';
+      let messageOptions;
+      if(status === 'pass') {
+        messageOptions = {
+          attachments: [
+            {
+              color: "3eb991",
+              title: reporterOptions.runName,
+              title_link: "https://dashboard.cypress.io/#/projects/runs",
+              text: passes +"/"+ (passes+fails)+"passed"
+            }
+          ],
+          icon_emoji: ''
+        };
+      } else {
+        messageOptions = {
+          attachments: [
+            {
+              color: "e01563",
+              title: reporterOptions.runName,
+              title_link: "https://dashboard.cypress.io/#/projects/runs",
+              text: passes +"/"+ (passes+fails)+"passed"
+            }
+          ],
+          icon_emoji: ''
+        };
+      }
       if (options.reporterOptions.endIcon) {
           messageOptions.icon_emoji = options.reporterOptions.endIcon;
       }else{
