@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { TestRail } from './testrail';
 import { titleToCaseIds } from './shared';
 import { Status, TestRailResult } from './testrail.interface';
+import NodeSlack from 'node-slack';
 const chalk = require('chalk');
 
 export class CypressTestRailReporter extends reporters.Spec {
@@ -11,8 +12,10 @@ export class CypressTestRailReporter extends reporters.Spec {
 
   constructor(runner: any, options: any) {
     super(runner);
-
+    let passes = 0;
+    let fails = 0;
     let reporterOptions = options.reporterOptions;
+    const slack = new NodeSlack(reporterOptions.slackUrl);
     this.testRail = new TestRail(reporterOptions);
     this.validate(reporterOptions, 'domain');
     this.validate(reporterOptions, 'username');
@@ -32,6 +35,7 @@ export class CypressTestRailReporter extends reporters.Spec {
     });
 
     runner.on('pass', test => {
+      passes++;
       const caseIds = titleToCaseIds(test.title);
       if (caseIds.length > 0) {
         const results = caseIds.map(caseId => {
@@ -46,6 +50,8 @@ export class CypressTestRailReporter extends reporters.Spec {
     });
 
     runner.on('fail', test => {
+      fails++;
+
       const caseIds = titleToCaseIds(test.title);
       if (caseIds.length > 0) {
         const results = caseIds.map(caseId => {
@@ -60,6 +66,17 @@ export class CypressTestRailReporter extends reporters.Spec {
     });
 
     runner.on('end', () => {
+      messageOptions = {
+          username: reporterOptions.runName+ " Tests Completed",
+          text: "Passed: " + passes + " Failed: " + failures,
+      };
+      if (options.reporterOptions.endIcon) {
+          messageOptions.icon_emoji = options.reporterOptions.endIcon;
+      }else{
+          messageOptions.icon_emoji = '';
+      }
+
+      slack.send(messageOptions);
       if (this.results.length == 0) {
         console.log('\n', chalk.magenta.underline.bold('(TestRail Reporter)'));
         console.warn(
